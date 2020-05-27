@@ -1,5 +1,5 @@
 
-namespace sasquatch_net_framework.Activities
+namespace Windows
 {
 	// REFERENCE: WinUser.h
 	enum Win32Msg: int
