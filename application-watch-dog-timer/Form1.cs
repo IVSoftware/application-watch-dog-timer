@@ -4,13 +4,7 @@ using Timer = System.Windows.Forms.Timer;
 
 namespace application_watch_dog_timer
 {
-    enum TimeOutState
-    {
-        Exit,
-        Warning,
-        Sleeping,
-        WakeUp
-    }
+    enum TimeOutState{ WakeUp = 3, Sleeping = 2, Warning = 1, Exit = 0 }
     public partial class Form1 : Form, IMessageFilter
     {
         public Form1()
@@ -21,7 +15,6 @@ namespace application_watch_dog_timer
             _wdt.Tick += _wdt_Tick;
         }
 
-        const int WM_MOUSEMOVE = 0x0200; // WinOS Message
         public bool PreFilterMessage(ref Message m)
         {
             switch (m.Msg)
@@ -32,6 +25,7 @@ namespace application_watch_dog_timer
             }
             return false; // Do not suppress downstream message
         }
+        const int WM_MOUSEMOVE = 0x0200; // WinOS Message
 
         protected override void OnHandleCreated(EventArgs e)
         {
@@ -72,12 +66,13 @@ namespace application_watch_dog_timer
                     // best to post the action in the message queue.
                     BeginInvoke((MethodInvoker)delegate
                     {
-                        textBox1.AppendText(_timeOutState.ToString() + Environment.NewLine);
+                        textBox1.AppendText(_timeOutState.ToString());
                         if(TimeOutState == TimeOutState.Warning)
                         {
                             textBox1.AppendText(
-                                "Closing in " + (_wdt.Interval/1000).ToString() + " seconds." + Environment.NewLine);
+                                ": Closing in " + (_wdt.Interval/1000).ToString() + " seconds.");
                         }
+                        textBox1.AppendText(Environment.NewLine);
                         textBox1.Select(textBox1.TextLength, 0);
                     });
                 }
