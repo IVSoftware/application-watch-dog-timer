@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 using Timer = System.Windows.Forms.Timer;
 
@@ -39,6 +40,7 @@ namespace application_watch_dog_timer
 
         private void _wdt_Tick(object sender, System.EventArgs e)
         {
+            Debug.WriteLine("Tick");
             // A tick reduces the TimeOutState by 1
             TimeOutState = (TimeOutState)(TimeOutState - 1);
         }
@@ -49,7 +51,7 @@ namespace application_watch_dog_timer
             get => _timeOutState;
             set
             {
-                switch (TimeOutState)
+                switch (value)
                 {
                     case TimeOutState.WakeUp:
                         _wdt.Stop();
@@ -62,6 +64,7 @@ namespace application_watch_dog_timer
                 }
                 if (value != _timeOutState)  // If state changes, write message
                 {
+                    Debug.WriteLine(value.ToString(), _timeOutState.ToString());
                     // In a timer callback that changes the UI, it's
                     // best to post the action in the message queue.
                     BeginInvoke((MethodInvoker)delegate
