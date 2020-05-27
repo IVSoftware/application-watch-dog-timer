@@ -22,13 +22,16 @@ namespace application_watch_dog_timer
         {
             switch (m.Msg)
             {
+                case WM_KEYDOWN:    // Added at OP's request
                 case WM_MOUSEMOVE:
                     TimeOutState = TimeOutState.WakeUp;
                     break;
             }
             return false; // Do not suppress downstream message
         }
-        const int WM_MOUSEMOVE = 0x0200; // WinOS Message
+        const int  // WinOS Messages
+            WM_KEYDOWN = 0x0100,
+            WM_MOUSEMOVE = 0x0200;
 
         protected override void OnHandleCreated(EventArgs e)
         {
