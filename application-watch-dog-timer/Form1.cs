@@ -15,6 +15,8 @@ namespace application_watch_dog_timer
             _wdt.Tick += _wdt_Tick;
         }
 
+        Timer _wdt; // Watch-Dog Timer
+
         public bool PreFilterMessage(ref Message m)
         {
             switch (m.Msg)
@@ -40,8 +42,6 @@ namespace application_watch_dog_timer
             // A tick reduces the TimeOutState by 1
             TimeOutState = (TimeOutState)(TimeOutState - 1);
         }
-        
-        Timer _wdt; // Watch-Dog Timer
 
         // Time out state machine
         TimeOutState TimeOutState
@@ -49,33 +49,34 @@ namespace application_watch_dog_timer
             get => _timeOutState;
             set
             {
-                if(value != _timeOutState)  // Check if property has changed
+                switch (TimeOutState)
                 {
-                    _timeOutState = value;
-                    switch (TimeOutState)
-                    {
-                        case TimeOutState.WakeUp:
-                            _wdt.Start();
-                            break;
-                        case TimeOutState.Exit:
-                            _wdt.Stop();
-                            Application.Exit();
-                            return;
-                    }
+                    case TimeOutState.WakeUp:
+                        _wdt.Stop();
+                        _wdt.Start();
+                        break;
+                    case TimeOutState.Exit:
+                        _wdt.Stop();
+                        Application.Exit();
+                        return;
+                }
+                if (value != _timeOutState)  // If state changes, write message
+                {
                     // In a timer callback that changes the UI, it's
                     // best to post the action in the message queue.
                     BeginInvoke((MethodInvoker)delegate
                     {
                         textBox1.AppendText(_timeOutState.ToString());
-                        if(TimeOutState == TimeOutState.Warning)
+                        if (TimeOutState == TimeOutState.Warning)
                         {
                             textBox1.AppendText(
-                                ": Closing in " + (_wdt.Interval/1000).ToString() + " seconds.");
+                                ": Closing in " + (_wdt.Interval / 1000).ToString() + " seconds.");
                         }
                         textBox1.AppendText(Environment.NewLine);
                         textBox1.Select(textBox1.TextLength, 0);
                     });
                 }
+                _timeOutState = value;
             }
         }
         TimeOutState _timeOutState = (TimeOutState)(-1);    // Initialize to invalid state
